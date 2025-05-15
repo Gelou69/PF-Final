@@ -61,44 +61,42 @@ class Player {
 }
 
 class Obstacle {
-  constructor(type) {
-    this.type = type || ["spike", "block", "rotator", "movingBlock", "portal"][Math.floor(Math.random() * 5)];
+  constructor() {
+    this.type = ["spike", "block", "rotator", "movingBlock", "portal"][Math.floor(Math.random() * 5)];
     this.width = 30;
     this.height = 30;
     this.x = canvas.width;
     this.y = canvas.height - this.height;
-    this.angle = 0; // for rotator
-    this.speed = Math.random() * 3 + 3; // Random speed for some obstacles
-    this.movingX = Math.random() * 200 - 100; // Random horizontal movement for some obstacles
-    this.mode = difficultySelect.value;
+    this.angle = 0;
+    this.speed = Math.random() * 3 + 3;
+    this.movingX = Math.random() * 200 - 100;
 
-    // Difficulty-specific adjustments
     this.adjustForDifficulty();
   }
 
   adjustForDifficulty() {
-    if (this.mode == 3) { // Easy
-      this.width = 20; // Smaller blocks
-      this.speed = 2; // Slower movement
+    if (gameSpeed == 3) { // Easy
+      this.width = 20;
+      this.speed = 2;
       this.height = 20;
-      this.type = Math.random() < 0.5 ? "block" : "spike"; // Simpler obstacles
-    } else if (this.mode == 6) { // Normal
+      this.type = Math.random() < 0.5 ? "block" : "spike";
+    } else if (gameSpeed == 6) { // Normal
       this.width = 30;
       this.speed = 3;
       this.height = 30;
-      this.type = Math.random() < 0.3 ? "rotator" : "movingBlock"; // Standard obstacles
-    } else if (this.mode == 9) { // Hard
-      this.width = 40; // Larger blocks
+      this.type = Math.random() < 0.3 ? "rotator" : "movingBlock";
+    } else if (gameSpeed == 9) { // Hard
+      this.width = 40;
       this.speed = 5;
       this.height = 40;
-      this.type = ["spike", "block", "rotator", "movingBlock", "portal"][Math.floor(Math.random() * 5)]; // More variety and faster
+      this.type = ["spike", "block", "rotator", "movingBlock", "portal"][Math.floor(Math.random() * 5)];
     }
   }
 
   update() {
     this.x -= this.speed;
     if (this.type === "movingBlock") {
-      this.y += Math.sin(this.movingX * 0.1) * 2; // Oscillating movement effect
+      this.y += Math.sin(this.movingX * 0.1) * 2;
       this.movingX += this.speed;
     }
     this.draw();
@@ -218,7 +216,7 @@ function gameLoop() {
   monster.update();
   spawnObstacle();
 
-  if (gameSpeed === 9) showHardModeWarning(); // Show warning if in hard mode
+  if (gameSpeed === 9) showHardModeWarning();
 
   for (let i = obstacles.length - 1; i >= 0; i--) {
     const obs = obstacles[i];
