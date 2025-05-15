@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Giometric Dash</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Geometry Dash Clone</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #111;
+    }
+    canvas {
+      display: block;
+      background: #222;
+    }
+  </style>
 </head>
-<body id="GUI">
-    <div style="display: none;">
-        <img id="city" src="cyberpunk-city.png" alt="">
-          <img id="city-reverse" src="cyberpunk-city-reverse.png" alt="">
-    </div>
-    <div id="canvas-set">
-          <canvas id="canvas-game"></canvas>
-          <canvas id="canvas-background"></canvas>
-    </div>
-    <script src="./main.js"></script>
+<body>
+  <canvas id="game"></canvas>
+  <script src="game.js"></script>
 </body>
 </html>
