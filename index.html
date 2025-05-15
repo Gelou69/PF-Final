@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <title>Geometry Dash Clone</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #111;
-    }
-    canvas {
-      display: block;
-      background: #222;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="ui">
+    <select id="difficulty">
+      <option value="3">Easy</option>
+      <option value="6" selected>Normal</option>
+      <option value="9">Hard</option>
+    </select>
+    <span id="score">Score: 0</span>
+    <span id="attempts">Attempts: 1</span>
+  </div>
   <canvas id="game"></canvas>
+  <audio id="bgMusic" src="music.mp3" loop></audio>
   <script src="game.js"></script>
 </body>
 </html>
