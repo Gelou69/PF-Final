@@ -1,4 +1,3 @@
-// Updated game.js with enhanced visuals and multiple obstacle styles
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -61,16 +60,22 @@ class Player {
 
 class Obstacle {
   constructor(type) {
-    this.type = type || ["spike", "block", "rotator"][Math.floor(Math.random() * 3)];
+    this.type = type || ["spike", "block", "rotator", "movingBlock", "portal"][Math.floor(Math.random() * 5)];
     this.width = 30;
     this.height = 30;
     this.x = canvas.width;
     this.y = canvas.height - this.height;
     this.angle = 0; // for rotator
+    this.speed = Math.random() * 3 + 3; // Random speed for some obstacles
+    this.movingX = Math.random() * 200 - 100; // Random horizontal movement for some obstacles
   }
 
   update() {
     this.x -= gameSpeed;
+    if (this.type === "movingBlock") {
+      this.y += Math.sin(this.movingX * 0.1) * 2; // Oscillating movement effect
+      this.movingX += this.speed;
+    }
     this.draw();
   }
 
@@ -93,6 +98,15 @@ class Obstacle {
       ctx.fillStyle = "magenta";
       ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
       ctx.restore();
+    } else if (this.type === "movingBlock") {
+      ctx.fillStyle = "#0f0";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    } else if (this.type === "portal") {
+      ctx.fillStyle = "cyan";
+      ctx.beginPath();
+      ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.fill();
     }
   }
 }
@@ -152,6 +166,7 @@ function resetGame() {
 function gameOver() {
   attempts++;
   attemptsDisplay.textContent = `Attempts: ${attempts}`;
+  alert("Touch to attempt again!");
   resetGame();
 }
 
