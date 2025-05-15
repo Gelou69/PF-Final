@@ -1,3 +1,4 @@
+// Updated game.js with enhanced visuals and multiple obstacle styles
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
@@ -6,17 +7,14 @@ canvas.height = 400;
 
 let gravity = 1;
 let gameSpeed = 6;
-let isGameOver = false;
 let score = 0;
 let attempts = 1;
 
 const difficultySelect = document.getElementById("difficulty");
 const scoreDisplay = document.getElementById("score");
 const attemptsDisplay = document.getElementById("attempts");
-
 const bgMusic = document.getElementById("bgMusic");
 bgMusic.volume = 0.5;
-bgMusic.play();
 
 difficultySelect.addEventListener("change", () => {
   gameSpeed = parseInt(difficultySelect.value);
@@ -44,28 +42,31 @@ class Player {
   update() {
     this.dy += gravity;
     this.y += this.dy;
-
     if (this.y + this.height >= canvas.height) {
       this.y = canvas.height - this.height;
       this.dy = 0;
       this.grounded = true;
     }
-
     this.draw();
   }
 
   draw() {
-    ctx.fillStyle = "#0ff";
+    ctx.shadowColor = '#00ffff';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = "#00ffff";
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.shadowBlur = 0;
   }
 }
 
 class Obstacle {
-  constructor() {
-    this.width = 20 + Math.random() * 30;
-    this.height = 30 + Math.random() * 30;
+  constructor(type) {
+    this.type = type || ["spike", "block", "rotator"][Math.floor(Math.random() * 3)];
+    this.width = 30;
+    this.height = 30;
     this.x = canvas.width;
     this.y = canvas.height - this.height;
+    this.angle = 0; // for rotator
   }
 
   update() {
@@ -74,13 +75,25 @@ class Obstacle {
   }
 
   draw() {
-    ctx.fillStyle = "red";
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y + this.height);
-    ctx.lineTo(this.x + this.width / 2, this.y);
-    ctx.lineTo(this.x + this.width, this.y + this.height);
-    ctx.closePath();
-    ctx.fill();
+    if (this.type === "spike") {
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y + this.height);
+      ctx.lineTo(this.x + this.width / 2, this.y);
+      ctx.lineTo(this.x + this.width, this.y + this.height);
+      ctx.closePath();
+      ctx.fill();
+    } else if (this.type === "block") {
+      ctx.fillStyle = "#ff0";
+      ctx.fillRect(this.x, this.y, this.width, this.height);
+    } else if (this.type === "rotator") {
+      ctx.save();
+      ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+      ctx.rotate((this.angle += 0.1));
+      ctx.fillStyle = "magenta";
+      ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+      ctx.restore();
+    }
   }
 }
 
@@ -99,8 +112,11 @@ class Monster {
   }
 
   draw() {
+    ctx.shadowColor = 'purple';
+    ctx.shadowBlur = 20;
     ctx.fillStyle = "purple";
     ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.shadowBlur = 0;
   }
 }
 
@@ -125,33 +141,31 @@ function detectCollision(a, b) {
 }
 
 function resetGame() {
-  isGameOver = false;
-  score = 0;
-  frames = 0;
   player = new Player();
   monster = new Monster();
   obstacles = [];
-  gameSpeed = parseInt(difficultySelect.value);
-  gameLoop();
+  frames = 0;
+  score = 0;
+  scoreDisplay.textContent = `Score: ${score}`;
 }
 
 function gameOver() {
-  isGameOver = true;
-  ctx.fillStyle = "#fff";
-  ctx.font = "48px sans-serif";
-  ctx.fillText("Game Over", canvas.width / 2 - 120, canvas.height / 2);
-  ctx.font = "24px sans-serif";
-  ctx.fillText("Press R to Retry", canvas.width / 2 - 90, canvas.height / 2 + 40);
+  attempts++;
+  attemptsDisplay.textContent = `Attempts: ${attempts}`;
+  resetGame();
+}
+
+function drawFloor() {
+  ctx.fillStyle = "#111";
+  ctx.fillRect(0, canvas.height - 5, canvas.width, 5);
 }
 
 function gameLoop() {
-  if (isGameOver) return;
-
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawFloor();
 
   player.update();
   monster.update();
-
   spawnObstacle();
 
   for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -159,8 +173,6 @@ function gameLoop() {
     obs.update();
 
     if (detectCollision(player, obs) || detectCollision(player, monster)) {
-      attempts++;
-      attemptsDisplay.textContent = `Attempts: ${attempts}`;
       return gameOver();
     }
 
@@ -177,7 +189,6 @@ function gameLoop() {
 
 window.addEventListener("keydown", (e) => {
   if (e.code === "Space") player.jump();
-  if (e.code === "KeyR") resetGame();
 });
 
 gameLoop();
